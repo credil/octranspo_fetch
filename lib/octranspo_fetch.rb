@@ -139,7 +139,7 @@ class OCTranspo
 
     found_data = false
 
-    xresult.xpath(parts[:route_xpath], OCT_NS).each do |route|
+    xresult.xpath(parts[:route_xpath]).each do |route|
       get_error(route, parts[:route_error])
 
       route_obj = {
@@ -150,7 +150,7 @@ class OCTranspo
         request_processing_time: route_no.nil? ? nil : Time.parse(get_value(route, "RequestProcessingTime")),
         trips: [],
       }
-      route.xpath("Trips/Trip", OCT_NS).each do |trip|
+      route.xpath("Trips/Trip").each do |trip|
         route_obj[:trips].push({
           destination: get_value(trip, "TripDestination"), # e.g. "Barhaven"
           start_time: get_value(trip, "TripStartTime"), # e.g. "14:25" TODO: parse to time
@@ -253,8 +253,9 @@ class OCTranspo
     end
     doc = Nokogiri::XML(response.body)
     doc.remove_namespaces!
-    xresult = doc.xpath("#{alt_resource}Result")
+    xresult = doc.xpath("//#{alt_resource}Result")
     if xresult.length == 0
+      byebug
       raise "Error: No reply for #{resource}"
     end
 
